@@ -3,6 +3,7 @@ import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
 import SideNav from '../components/SideNav';
 import GlassPanel from '../components/GlassPanel';
 import Card from '../components/Card';
+import Footer from '../components/Footer';
 import '../styles/theme.css';
 
 const portfolioData = [
@@ -203,6 +204,7 @@ export default function BankAdmin(){
           </GlassPanel>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

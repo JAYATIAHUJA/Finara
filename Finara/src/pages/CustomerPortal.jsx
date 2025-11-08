@@ -2,6 +2,7 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import GlassPanel from '../components/GlassPanel';
 import Card from '../components/Card';
+import Footer from '../components/Footer';
 import '../styles/theme.css';
 
 const transactionHistory = [
@@ -145,6 +146,7 @@ export default function CustomerPortal(){
           </GlassPanel>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

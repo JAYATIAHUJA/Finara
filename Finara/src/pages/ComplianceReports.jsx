@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import SideNav from '../components/SideNav';
 import GlassPanel from '../components/GlassPanel';
+import Card from '../components/Card';
+import Footer from '../components/Footer';
 import '../styles/theme.css';
 
 const kycQueue = [
@@ -19,137 +22,182 @@ export default function ComplianceReports(){
   const [selectedKYC, setSelectedKYC] = useState(null);
 
   return (
-    <div style={{padding:'24px 48px',maxWidth:'1400px',margin:'0 auto'}}>
-      <div style={{marginBottom:20}}>
-        <h2 style={{margin:'0 0 6px'}}>Compliance & Reports</h2>
-        <div className="small-muted">Manage KYC approvals, freeze controls, and export audit logs</div>
-      </div>
-
-      <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:16,marginBottom:16}}>
-        <GlassPanel>
-          <h3 style={{marginTop:0,marginBottom:16}}>KYC Approval Queue</h3>
-          <div className="small-muted" style={{marginBottom:16}}>Review pending KYC applications and approve or freeze accounts</div>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Wallet</th>
-                <th>Risk Level</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {kycQueue.map((kyc, i) => (
-                <tr key={i}>
-                  <td className="small-muted">{kyc.id}</td>
-                  <td style={{fontWeight:600}}>{kyc.name}</td>
-                  <td className="small-muted">{kyc.wallet}</td>
-                  <td>
-                    <span style={{padding:'4px 8px',borderRadius:6,background: kyc.risk === 'Low' ? 'rgba(155,225,43,0.1)' : 'rgba(255,200,58,0.1)',color: kyc.risk === 'Low' ? 'var(--accent)' : '#ffc83a',fontSize:'0.85rem'}}>
-                      {kyc.risk}
-                    </span>
-                  </td>
-                  <td>
-                    <span style={{padding:'4px 8px',borderRadius:6,background:'rgba(199,255,58,0.1)',color:'var(--accent)',fontSize:'0.85rem'}}>
-                      {kyc.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{display:'flex',gap:6}}>
-                      <button className="btn primary" style={{fontSize:'0.85rem',padding:'6px 10px'}}>✓ Approve</button>
-                      <button className="btn" style={{fontSize:'0.85rem',padding:'6px 10px'}}>✕ Reject</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </GlassPanel>
-
-        <GlassPanel>
-          <h4 style={{marginTop:0,marginBottom:16}}>Quick Stats</h4>
-          <div style={{padding:'12px 0',borderBottom:'1px solid rgba(255,255,255,0.03)'}}>
-            <div className="small-muted">Pending KYC</div>
-            <div style={{fontSize:'1.8rem',fontWeight:700,color:'var(--accent)'}}>3</div>
-          </div>
-          <div style={{padding:'12px 0',borderBottom:'1px solid rgba(255,255,255,0.03)'}}>
-            <div className="small-muted">Approved Today</div>
-            <div style={{fontSize:'1.8rem',fontWeight:700}}>7</div>
-          </div>
-          <div style={{padding:'12px 0',borderBottom:'1px solid rgba(255,255,255,0.03)'}}>
-            <div className="small-muted">Frozen Accounts</div>
-            <div style={{fontSize:'1.8rem',fontWeight:700}}>2</div>
-          </div>
-          <div style={{padding:'12px 0'}}>
-            <div className="small-muted">Total Audits</div>
-            <div style={{fontSize:'1.8rem',fontWeight:700}}>142</div>
-          </div>
-        </GlassPanel>
-      </div>
-
-      <div className="grid">
-        <div className="col-8">
-          <GlassPanel>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <div>
-                <h3 style={{margin:'0 0 4px'}}>Audit Logs</h3>
-                <div className="small-muted">Exportable CSV/PDF with signed on-chain references</div>
-              </div>
-              <div style={{display:'flex',gap:8}}>
-                <button className="btn" style={{fontSize:'0.9rem'}}>📄 Export CSV</button>
-                <button className="btn" style={{fontSize:'0.9rem'}}>📕 Export PDF</button>
-              </div>
-            </div>
-            <div style={{maxHeight:300,overflowY:'auto'}}>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Timestamp</th>
-                    <th>Action</th>
-                    <th>User</th>
-                    <th>Target</th>
-                    <th>Tx Hash</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {auditLogs.map((log, i) => (
-                    <tr key={i}>
-                      <td className="small-muted">{log.timestamp}</td>
-                      <td style={{fontWeight:600}}>{log.action}</td>
-                      <td className="small-muted">{log.user}</td>
-                      <td>{log.target}</td>
-                      <td className="small-muted">{log.txHash}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </GlassPanel>
+    <div style={{display:'flex',minHeight:'100vh',background:'#000'}}>
+      <SideNav active="reports" />
+      
+      <div style={{flex:1,padding:'32px 48px',paddingBottom:0,display:'flex',flexDirection:'column'}}>
+        {/* Header */}
+        <div style={{marginBottom:32}}>
+          <h1 style={{fontSize:'2.5rem',fontWeight:700,marginBottom:8,color:'#fff'}}>Compliance & Reports</h1>
+          <p className="small-muted" style={{fontSize:'1.05rem'}}>
+            Manage KYC approvals, freeze controls, and export audit logs
+          </p>
         </div>
 
-        <div className="col-4">
-          <GlassPanel>
-            <h4 style={{marginTop:0,marginBottom:16}}>Freeze Controls</h4>
-            <div className="small-muted" style={{marginBottom:16}}>Freeze/unfreeze tokens or accounts by audit ID</div>
-            <div style={{marginBottom:12}}>
-              <label style={{display:'block',marginBottom:6,fontWeight:600,fontSize:'0.9rem'}}>Wallet Address</label>
-              <input type="text" placeholder="0x..." className="btn" style={{width:'100%',padding:'10px'}} />
+        {/* Quick Stats */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:20,marginBottom:32}}>
+          <Card>
+            <div style={{fontSize:'2rem',marginBottom:12}}>📋</div>
+            <div className="small-muted" style={{marginBottom:8,fontSize:'0.9rem'}}>Pending KYC</div>
+            <div style={{display:'flex',alignItems:'baseline',gap:12}}>
+              <div style={{fontSize:'2rem',fontWeight:700,color:'var(--accent)'}}>3</div>
             </div>
-            <div style={{marginBottom:12}}>
-              <label style={{display:'block',marginBottom:6,fontWeight:600,fontSize:'0.9rem'}}>Reason</label>
-              <select className="btn" style={{width:'100%',textAlign:'left',padding:'10px'}}>
+          </Card>
+          <Card>
+            <div style={{fontSize:'2rem',marginBottom:12}}>✓</div>
+            <div className="small-muted" style={{marginBottom:8,fontSize:'0.9rem'}}>Approved Today</div>
+            <div style={{display:'flex',alignItems:'baseline',gap:12}}>
+              <div style={{fontSize:'2rem',fontWeight:700,color:'#fff'}}>7</div>
+            </div>
+          </Card>
+          <Card>
+            <div style={{fontSize:'2rem',marginBottom:12}}>🔒</div>
+            <div className="small-muted" style={{marginBottom:8,fontSize:'0.9rem'}}>Frozen Accounts</div>
+            <div style={{display:'flex',alignItems:'baseline',gap:12}}>
+              <div style={{fontSize:'2rem',fontWeight:700,color:'#fff'}}>2</div>
+            </div>
+          </Card>
+          <Card>
+            <div style={{fontSize:'2rem',marginBottom:12}}>📊</div>
+            <div className="small-muted" style={{marginBottom:8,fontSize:'0.9rem'}}>Total Audits</div>
+            <div style={{display:'flex',alignItems:'baseline',gap:12}}>
+              <div style={{fontSize:'2rem',fontWeight:700,color:'#fff'}}>142</div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Main Content Grid */}
+        <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:24,marginBottom:32}}>
+          {/* KYC Approval Queue */}
+          <GlassPanel style={{padding:28}}>
+            <h3 style={{fontSize:'1.4rem',fontWeight:700,marginBottom:20,color:'#fff'}}>KYC Approval Queue</h3>
+            <div className="small-muted" style={{marginBottom:20}}>Review pending KYC applications and approve or freeze accounts</div>
+            
+            <div style={{display:'flex',flexDirection:'column',gap:12}}>
+              {kycQueue.map((kyc, i) => (
+                <div key={i} style={{
+                  padding:20,
+                  background:'rgba(255,255,255,0.02)',
+                  borderRadius:12,
+                  border:'1px solid rgba(255,255,255,0.06)',
+                  display:'flex',
+                  justifyContent:'space-between',
+                  alignItems:'center'
+                }}>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:'1.05rem',fontWeight:600,color:'#fff',marginBottom:4}}>{kyc.name}</div>
+                    <div style={{fontSize:'0.85rem',color:'var(--muted)'}}>
+                      {kyc.id} • {kyc.wallet}
+                    </div>
+                  </div>
+                  <div style={{display:'flex',gap:12,alignItems:'center'}}>
+                    <div style={{
+                      padding:'4px 12px',
+                      borderRadius:20,
+                      background: kyc.risk === 'Low' ? 'rgba(155,225,43,0.15)' : 'rgba(255,200,58,0.15)',
+                      color: kyc.risk === 'Low' ? 'var(--accent)' : '#ffc83a',
+                      fontSize:'0.85rem',
+                      fontWeight:600
+                    }}>
+                      {kyc.risk} Risk
+                    </div>
+                    <div style={{
+                      padding:'4px 12px',
+                      borderRadius:20,
+                      background:'rgba(199,255,58,0.15)',
+                      color:'var(--accent)',
+                      fontSize:'0.85rem',
+                      fontWeight:600
+                    }}>
+                      {kyc.status}
+                    </div>
+                  </div>
+                  <div style={{display:'flex',gap:8,marginLeft:16}}>
+                    <button className="btn primary" style={{fontSize:'0.9rem',padding:'8px 16px'}}>✓ Approve</button>
+                    <button className="btn" style={{fontSize:'0.9rem',padding:'8px 16px'}}>✕ Reject</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </GlassPanel>
+
+          {/* Freeze Controls */}
+          <GlassPanel style={{padding:28}}>
+            <h3 style={{fontSize:'1.4rem',fontWeight:700,marginBottom:20,color:'#fff'}}>Freeze Controls</h3>
+            <div className="small-muted" style={{marginBottom:20}}>Freeze/unfreeze tokens or accounts</div>
+            
+            <div style={{marginBottom:20}}>
+              <label style={{display:'block',marginBottom:8,fontSize:'0.95rem',fontWeight:500,color:'rgba(255,255,255,0.9)'}}>
+                Wallet Address
+              </label>
+              <input 
+                type="text" 
+                placeholder="0x..." 
+                className="form-input"
+              />
+            </div>
+            
+            <div style={{marginBottom:24}}>
+              <label style={{display:'block',marginBottom:8,fontSize:'0.95rem',fontWeight:500,color:'rgba(255,255,255,0.9)'}}>
+                Reason
+              </label>
+              <select className="form-input">
                 <option>Suspicious Activity</option>
                 <option>Regulatory Hold</option>
                 <option>Court Order</option>
                 <option>Risk Assessment</option>
               </select>
             </div>
-            <button className="btn primary" style={{width:'100%',marginBottom:8}}>🔒 Freeze Account</button>
-            <button className="btn" style={{width:'100%'}}>🔓 Unfreeze Account</button>
+            
+            <button className="btn primary" style={{width:'100%',marginBottom:12,padding:'14px',justifyContent:'center'}}>
+              🔒 Freeze Account
+            </button>
+            <button className="btn" style={{width:'100%',padding:'14px',justifyContent:'center'}}>
+              🔓 Unfreeze Account
+            </button>
           </GlassPanel>
         </div>
+
+        {/* Audit Logs */}
+        <GlassPanel style={{padding:28,marginBottom:32}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}}>
+            <div>
+              <h3 style={{fontSize:'1.4rem',fontWeight:700,marginBottom:8,color:'#fff'}}>Audit Logs</h3>
+              <div className="small-muted">Exportable CSV/PDF with signed on-chain references</div>
+            </div>
+            <div style={{display:'flex',gap:12}}>
+              <button className="btn" style={{padding:'12px 20px'}}>📄 Export CSV</button>
+              <button className="btn primary" style={{padding:'12px 20px'}}>📕 Export PDF</button>
+            </div>
+          </div>
+          
+          <div style={{overflowX:'auto'}}>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th style={{padding:'12px 16px'}}>Timestamp</th>
+                  <th>Action</th>
+                  <th>User</th>
+                  <th>Target</th>
+                  <th>Tx Hash</th>
+                </tr>
+              </thead>
+              <tbody>
+                {auditLogs.map((log, i) => (
+                  <tr key={i}>
+                    <td style={{padding:'12px 16px',color:'var(--muted)'}}>{log.timestamp}</td>
+                    <td style={{fontWeight:600,color:'#fff'}}>{log.action}</td>
+                    <td style={{color:'var(--muted)'}}>{log.user}</td>
+                    <td style={{color:'#fff'}}>{log.target}</td>
+                    <td style={{color:'var(--muted)',fontFamily:'monospace',fontSize:'0.9rem'}}>{log.txHash}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </GlassPanel>
+
+        <Footer />
       </div>
     </div>
   );
