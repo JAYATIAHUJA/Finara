@@ -2,6 +2,7 @@ import React from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import GlassPanel from '../components/GlassPanel';
 import Card from '../components/Card';
+import Footer from '../components/Footer';
 import '../styles/theme.css';
 
 const marketData = [
@@ -160,6 +161,7 @@ export default function InvestorDashboard(){
           </GlassPanel>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

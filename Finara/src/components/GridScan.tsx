@@ -756,3 +756,5 @@ function smoothDampFloat(
   }
   return { value: out, v: velRef.v };
 }
+
+export default GridScan;

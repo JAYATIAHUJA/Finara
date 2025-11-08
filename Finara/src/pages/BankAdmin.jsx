@@ -1,207 +1,263 @@
 import React, {useState} from 'react';
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { useNavigate } from 'react-router-dom';
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import SideNav from '../components/SideNav';
 import GlassPanel from '../components/GlassPanel';
 import Card from '../components/Card';
+import Footer from '../components/Footer';
 import '../styles/theme.css';
 
 const portfolioData = [
-  { month: 'Jan', value: 180, loans: 15 },
-  { month: 'Feb', value: 240, loans: 18 },
-  { month: 'Mar', value: 320, loans: 22 },
-  { month: 'Apr', value: 410, loans: 26 },
-  { month: 'May', value: 480, loans: 28 },
-  { month: 'Jun', value: 560, loans: 31 },
+  { month: 'Jan', tvl: 180, loans: 15, tokens: 850 },
+  { month: 'Feb', tvl: 240, loans: 18, tokens: 1200 },
+  { month: 'Mar', tvl: 320, loans: 22, tokens: 1600 },
+  { month: 'Apr', tvl: 410, loans: 26, tokens: 2100 },
+  { month: 'May', tvl: 480, loans: 28, tokens: 2450 },
+  { month: 'Jun', tvl: 560, loans: 31, tokens: 2800 },
+];
+
+const assetDistribution = [
+  { name: 'Gold', value: 450, color: '#FFD700' },
+  { name: 'Real Estate', value: 320, color: '#9be12b' },
+  { name: 'Stocks', value: 180, color: '#c7ff3a' },
+  { name: 'Mutual Funds', value: 150, color: '#82ca9d' },
 ];
 
 const recentActivity = [
-  { event: '🪙 Token minted', wallet: '0xA1b2...', amount: '50 FNA', time: '2h ago' },
-  { event: '💰 Loan issued', wallet: '0xC3d4...', amount: '120 FNA', time: '6h ago' },
-  { event: '✓ KYC approved', wallet: '0xE5f6...', amount: '—', time: '1d ago' },
-  { event: '📊 Asset tokenized', wallet: '0xG7h8...', amount: '250 FNA', time: '2d ago' },
+  { event: '🪙 Token Minted', customer: 'Rajesh Kumar', amount: '520 GOLD', time: '2h ago', status: 'success' },
+  { event: '💰 Loan Disbursed', customer: 'Priya Sharma', amount: '₹4,00,000', time: '4h ago', status: 'success' },
+  { event: '✓ KYC Approved', customer: 'Amit Patel', amount: '—', time: '6h ago', status: 'info' },
+  { event: '📊 Asset Tokenized', customer: 'Sneha Reddy', amount: '₹3.2L Gold', time: '8h ago', status: 'success' },
+  { event: '🔒 Account Frozen', customer: 'Suspicious Activity', amount: '0xE5f6...', time: '1d ago', status: 'warning' },
+];
+
+const topCustomers = [
+  { name: 'Rajesh Kumar', tvl: '₹12.5L', loans: 3, tokens: '1,250', risk: 'Low' },
+  { name: 'Deepak Singh', tvl: '₹10.2L', loans: 2, tokens: '1,020', risk: 'Low' },
+  { name: 'Amit Patel', tvl: '₹8.5L', loans: 4, tokens: '850', risk: 'Medium' },
 ];
 
 export default function BankAdmin(){
-  const [section, setSection] = useState('dashboard');
+  const navigate = useNavigate();
+  const [timeRange, setTimeRange] = useState('6M');
 
   return (
-    <div className="app-shell">
-      <SideNav current={section} onSelect={setSection} />
-      <div className="main-panel">
-        {section==='dashboard' && (
-          <>
-            <div style={{marginBottom:20}}>
-              <h2 style={{margin:'0 0 6px'}}>Bank Admin Dashboard</h2>
-              <div className="small-muted">Overview of customer onboarding, asset tokenization, and loan portfolio</div>
+    <div style={{display:'flex',minHeight:'100vh',background:'#000'}}>
+      <SideNav active="bank" />
+      
+      <div style={{flex:1,padding:'32px 48px',paddingBottom:0,display:'flex',flexDirection:'column'}}>
+        {/* Header */}
+        <div style={{marginBottom:32}}>
+          <h1 style={{fontSize:'2.5rem',fontWeight:700,marginBottom:8,color:'#fff'}}>Bank Console</h1>
+          <p className="small-muted" style={{fontSize:'1.05rem'}}>
+            Complete overview of tokenization, lending, and compliance operations
+          </p>
+        </div>
+
+        {/* Quick Actions */}
+        <div style={{display:'flex',gap:16,marginBottom:32,flexWrap:'wrap'}}>
+          <button className="btn primary" onClick={() => navigate('/customer/add')} style={{padding:'14px 28px',fontSize:'1rem'}}>
+            + Onboard Customer
+          </button>
+          <button className="btn" style={{padding:'14px 28px',fontSize:'1rem'}}>
+            🪙 Mint Tokens
+          </button>
+          <button className="btn" style={{padding:'14px 28px',fontSize:'1rem'}}>
+            💰 Create Loan
+          </button>
+          <button className="btn" onClick={() => navigate('/reports')} style={{padding:'14px 28px',fontSize:'1rem'}}>
+            📊 Export Report
+          </button>
+        </div>
+
+        {/* Stats Grid */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:20,marginBottom:32}}>
+          <Card>
+            <div style={{fontSize:'2rem',marginBottom:12}}>💰</div>
+            <div className="small-muted" style={{marginBottom:8,fontSize:'0.9rem'}}>Total Value Locked</div>
+            <div style={{display:'flex',alignItems:'baseline',gap:12}}>
+              <div style={{fontSize:'2rem',fontWeight:700,color:'var(--accent)'}}>₹56L</div>
+              <div style={{fontSize:'0.9rem',color:'#82ca9d',fontWeight:600}}>+18%</div>
             </div>
-
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16,marginBottom:16}}>
-              <Card title="Customer Onboarding" subtitle="KYC pipeline & approvals">
-                <div style={{fontSize:'2rem',fontWeight:700,color:'var(--accent)',marginBottom:4}}>3</div>
-                <div className="small-muted">Pending KYC approvals</div>
-                <button className="btn" style={{marginTop:12,fontSize:'0.9rem'}}>Review Queue →</button>
-              </Card>
-              <Card title="Asset Tokenization" subtitle="Create tokenized assets">
-                <div style={{fontSize:'2rem',fontWeight:700,color:'var(--accent)',marginBottom:4}}>12</div>
-                <div className="small-muted">Assets tokenized this month</div>
-                <button className="btn" style={{marginTop:12,fontSize:'0.9rem'}}>Tokenize Asset →</button>
-              </Card>
-              <Card title="Loan Management" subtitle="Active loans & delinquencies">
-                <div style={{fontSize:'2rem',fontWeight:700,color:'var(--accent)',marginBottom:4}}>24</div>
-                <div className="small-muted">Active loans — Avg collateral 175%</div>
-                <button className="btn" style={{marginTop:12,fontSize:'0.9rem'}}>Manage Loans →</button>
-              </Card>
+          </Card>
+          <Card>
+            <div style={{fontSize:'2rem',marginBottom:12}}>👥</div>
+            <div className="small-muted" style={{marginBottom:8,fontSize:'0.9rem'}}>Active Customers</div>
+            <div style={{display:'flex',alignItems:'baseline',gap:12}}>
+              <div style={{fontSize:'2rem',fontWeight:700,color:'#fff'}}>248</div>
+              <div style={{fontSize:'0.9rem',color:'#82ca9d',fontWeight:600}}>+12%</div>
             </div>
-
-            <div className="grid">
-              <div className="col-8">
-                <GlassPanel>
-                  <h3 className="title">Portfolio Analytics</h3>
-                  <div className="small-muted" style={{marginBottom:16}}>Total value locked (TVL) and loan growth over time</div>
-                  <ResponsiveContainer width="100%" height={280}>
-                    <AreaChart data={portfolioData}>
-                      <defs>
-                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="var(--accent)" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                      <XAxis dataKey="month" stroke="var(--muted)" style={{fontSize:12}} />
-                      <YAxis stroke="var(--muted)" style={{fontSize:12}} />
-                      <Tooltip 
-                        contentStyle={{background:'rgba(11,15,18,0.95)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:8,color:'#fff'}}
-                      />
-                      <Area type="monotone" dataKey="value" stroke="var(--accent)" fillOpacity={1} fill="url(#colorValue)" strokeWidth={2} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </GlassPanel>
-              </div>
-              <div className="col-4">
-                <GlassPanel>
-                  <h4 style={{marginTop:0,marginBottom:16}}>Recent Activity</h4>
-                  <div style={{maxHeight:300,overflowY:'auto'}}>
-                    {recentActivity.map((act, i) => (
-                      <div key={i} style={{padding:'10px 0',borderBottom: i < recentActivity.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none'}}>
-                        <div style={{fontWeight:600,fontSize:'0.95rem',marginBottom:2}}>{act.event}</div>
-                        <div className="small-muted">{act.wallet} • {act.amount}</div>
-                        <div className="small-muted" style={{fontSize:'0.8rem',marginTop:2}}>{act.time}</div>
-                      </div>
-                    ))}
-                  </div>
-                </GlassPanel>
-              </div>
+          </Card>
+          <Card>
+            <div style={{fontSize:'2rem',marginBottom:12}}>🪙</div>
+            <div className="small-muted" style={{marginBottom:8,fontSize:'0.9rem'}}>Tokens Minted</div>
+            <div style={{display:'flex',alignItems:'baseline',gap:12}}>
+              <div style={{fontSize:'2rem',fontWeight:700,color:'#fff'}}>2.8K</div>
+              <div style={{fontSize:'0.9rem',color:'#82ca9d',fontWeight:600}}>+22%</div>
             </div>
-          </>
-        )}
+          </Card>
+          <Card>
+            <div style={{fontSize:'2rem',marginBottom:12}}>💵</div>
+            <div className="small-muted" style={{marginBottom:8,fontSize:'0.9rem'}}>Active Loans</div>
+            <div style={{display:'flex',alignItems:'baseline',gap:12}}>
+              <div style={{fontSize:'2rem',fontWeight:700,color:'#fff'}}>31</div>
+              <div style={{fontSize:'0.9rem',color:'#82ca9d',fontWeight:600}}>+8%</div>
+            </div>
+          </Card>
+        </div>
 
-        {section==='onboarding' && (
-          <GlassPanel>
-            <h3 style={{marginTop:0,marginBottom:16}}>Customer Onboarding</h3>
-            <div className="small-muted" style={{marginBottom:20}}>List of pending KYC with approve/reject actions and audit trail.</div>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Customer</th>
-                  <th>Account ID</th>
-                  <th>Wallet</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Alice Johnson</td>
-                  <td>ACC-1001</td>
-                  <td className="small-muted">0xA1b2...c3D4</td>
-                  <td><span style={{padding:'4px 8px',borderRadius:6,background:'rgba(199,255,58,0.1)',color:'var(--accent)',fontSize:'0.85rem'}}>Pending</span></td>
-                  <td><button className="btn" style={{fontSize:'0.85rem'}}>Approve</button></td>
-                </tr>
-                <tr>
-                  <td>Bob Smith</td>
-                  <td>ACC-1002</td>
-                  <td className="small-muted">0xE5f6...g7H8</td>
-                  <td><span style={{padding:'4px 8px',borderRadius:6,background:'rgba(199,255,58,0.1)',color:'var(--accent)',fontSize:'0.85rem'}}>Pending</span></td>
-                  <td><button className="btn" style={{fontSize:'0.85rem'}}>Approve</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </GlassPanel>
-        )}
-
-        {section==='tokenization' && (
-          <GlassPanel>
-            <h3 style={{marginTop:0,marginBottom:16}}>Asset Tokenization</h3>
-            <div className="small-muted" style={{marginBottom:20}}>Create and manage tokenized assets, set caps, and mint tokens.</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:20}}>
+        {/* Charts Section */}
+        <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:24,marginBottom:32}}>
+          {/* Portfolio Growth */}
+          <GlassPanel style={{padding:28}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}}>
               <div>
-                <label style={{display:'block',marginBottom:6,fontWeight:600}}>Asset Type</label>
-                <select className="btn" style={{width:'100%',textAlign:'left'}}>
-                  <option>Gold</option>
-                  <option>Real Estate</option>
-                  <option>Stocks</option>
-                </select>
+                <h3 style={{fontSize:'1.4rem',fontWeight:700,marginBottom:8,color:'#fff'}}>Portfolio Growth</h3>
+                <div className="small-muted">Total Value Locked & Loan Volume</div>
               </div>
-              <div>
-                <label style={{display:'block',marginBottom:6,fontWeight:600}}>Token Amount</label>
-                <input type="number" placeholder="Enter amount" className="btn" style={{width:'100%'}} />
+              <div style={{display:'flex',gap:8}}>
+                {['1M', '3M', '6M', '1Y'].map((range) => (
+                  <button
+                    key={range}
+                    className={timeRange === range ? 'btn primary' : 'btn'}
+                    onClick={() => setTimeRange(range)}
+                    style={{padding:'6px 14px',fontSize:'0.85rem'}}
+                  >
+                    {range}
+                  </button>
+                ))}
               </div>
             </div>
-            <button className="btn primary">Tokenize Asset</button>
-          </GlassPanel>
-        )}
-
-        {section==='loans' && (
-          <GlassPanel>
-            <h3 style={{marginTop:0,marginBottom:16}}>Loan Management</h3>
-            <div className="small-muted" style={{marginBottom:20}}>Create loans, view collateral, initiate liquidations.</div>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Loan ID</th>
-                  <th>Borrower</th>
-                  <th>Amount</th>
-                  <th>Collateral</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>#L001</td>
-                  <td className="small-muted">0xA1b2...c3D4</td>
-                  <td>120 FNA</td>
-                  <td style={{color:'var(--accent)'}}>210 FNA (175%)</td>
-                  <td><span style={{padding:'4px 8px',borderRadius:6,background:'rgba(155,225,43,0.1)',color:'var(--accent-2)',fontSize:'0.85rem'}}>Active</span></td>
-                </tr>
-                <tr>
-                  <td>#L002</td>
-                  <td className="small-muted">0xE5f6...g7H8</td>
-                  <td>85 FNA</td>
-                  <td style={{color:'var(--accent)'}}>140 FNA (165%)</td>
-                  <td><span style={{padding:'4px 8px',borderRadius:6,background:'rgba(155,225,43,0.1)',color:'var(--accent-2)',fontSize:'0.85rem'}}>Active</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </GlassPanel>
-        )}
-
-        {section==='analytics' && (
-          <GlassPanel>
-            <h3 style={{marginTop:0,marginBottom:16}}>Portfolio Analytics</h3>
-            <div className="small-muted" style={{marginBottom:20}}>Time series, allocation, risk metrics and scenario simulator.</div>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={portfolioData}>
+            <ResponsiveContainer width="100%" height={280}>
+              <AreaChart data={portfolioData}>
+                <defs>
+                  <linearGradient id="colorTVL" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="var(--accent)" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorLoans" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#82ca9d" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                 <XAxis dataKey="month" stroke="var(--muted)" style={{fontSize:12}} />
                 <YAxis stroke="var(--muted)" style={{fontSize:12}} />
                 <Tooltip 
-                  contentStyle={{background:'rgba(11,15,18,0.95)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:8,color:'#fff'}}
+                  contentStyle={{background:'rgba(11,15,18,0.95)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:12,color:'#fff',padding:12}}
                 />
-                <Bar dataKey="loans" fill="var(--accent)" radius={[8, 8, 0, 0]} />
-              </BarChart>
+                <Area type="monotone" dataKey="tvl" stroke="var(--accent)" fillOpacity={1} fill="url(#colorTVL)" strokeWidth={2} name="TVL (₹L)" />
+                <Area type="monotone" dataKey="loans" stroke="#82ca9d" fillOpacity={1} fill="url(#colorLoans)" strokeWidth={2} name="Loans" />
+              </AreaChart>
             </ResponsiveContainer>
           </GlassPanel>
-        )}
+
+          {/* Asset Distribution */}
+          <GlassPanel style={{padding:28}}>
+            <h3 style={{fontSize:'1.4rem',fontWeight:700,marginBottom:20,color:'#fff'}}>Asset Distribution</h3>
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={assetDistribution}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={90}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {assetDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{background:'rgba(11,15,18,0.95)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:12,color:'#fff'}}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div style={{display:'flex',flexDirection:'column',gap:12,marginTop:16}}>
+              {assetDistribution.map((asset, i) => (
+                <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:8}}>
+                    <div style={{width:12,height:12,borderRadius:'50%',background:asset.color}}></div>
+                    <span style={{fontSize:'0.9rem',color:'rgba(255,255,255,0.8)'}}>{asset.name}</span>
+                  </div>
+                  <span style={{fontSize:'0.9rem',fontWeight:600,color:'#fff'}}>₹{asset.value}L</span>
+                </div>
+              ))}
+            </div>
+          </GlassPanel>
+        </div>
+
+        {/* Bottom Section */}
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24,marginBottom:32}}>
+          {/* Recent Activity */}
+          <GlassPanel style={{padding:28}}>
+            <h3 style={{fontSize:'1.4rem',fontWeight:700,marginBottom:20,color:'#fff'}}>Recent Activity</h3>
+            <div style={{display:'flex',flexDirection:'column',gap:12}}>
+              {recentActivity.map((activity, i) => (
+                <div key={i} style={{
+                  padding:16,
+                  background:'rgba(255,255,255,0.02)',
+                  borderRadius:12,
+                  border:'1px solid rgba(255,255,255,0.06)',
+                  display:'flex',
+                  justifyContent:'space-between',
+                  alignItems:'center'
+                }}>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:'1rem',fontWeight:600,color:'#fff',marginBottom:4}}>{activity.event}</div>
+                    <div style={{fontSize:'0.9rem',color:'var(--muted)'}}>
+                      {activity.customer} • {activity.amount}
+                    </div>
+                  </div>
+                  <div style={{textAlign:'right'}}>
+                    <div style={{fontSize:'0.85rem',color:'var(--muted)'}}>{activity.time}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </GlassPanel>
+
+          {/* Top Customers */}
+          <GlassPanel style={{padding:28}}>
+            <h3 style={{fontSize:'1.4rem',fontWeight:700,marginBottom:20,color:'#fff'}}>Top Customers by TVL</h3>
+            <div style={{display:'flex',flexDirection:'column',gap:12}}>
+              {topCustomers.map((customer, i) => (
+                <div key={i} style={{
+                  padding:20,
+                  background:'rgba(255,255,255,0.02)',
+                  borderRadius:12,
+                  border:'1px solid rgba(255,255,255,0.06)'
+                }}>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:12}}>
+                    <div style={{fontSize:'1.05rem',fontWeight:600,color:'#fff'}}>{customer.name}</div>
+                    <div style={{fontSize:'1.1rem',fontWeight:700,color:'var(--accent)'}}>{customer.tvl}</div>
+                  </div>
+                  <div style={{display:'flex',gap:20,fontSize:'0.9rem'}}>
+                    <div>
+                      <span style={{color:'var(--muted)'}}>Loans:</span>{' '}
+                      <span style={{color:'#fff',fontWeight:600}}>{customer.loans}</span>
+                    </div>
+                    <div>
+                      <span style={{color:'var(--muted)'}}>Tokens:</span>{' '}
+                      <span style={{color:'#fff',fontWeight:600}}>{customer.tokens}</span>
+                    </div>
+                    <div>
+                      <span style={{color:'var(--muted)'}}>Risk:</span>{' '}
+                      <span style={{
+                        color: customer.risk === 'Low' ? 'var(--accent)' : '#ffc83a',
+                        fontWeight:600
+                      }}>{customer.risk}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </GlassPanel>
+        </div>
+
+        <Footer />
       </div>
     </div>
   );
