@@ -117,52 +117,154 @@ export default function CustomerPortal(){
 
   if (!isLoggedIn) {
     return (
-      <div style={{minHeight:'100vh',background:'#000',paddingTop:'90px',display:'flex',alignItems:'center'}}>
+      <div style={{minHeight:'100vh',background:'#000',display:'flex',flexDirection:'column'}}>
         <NavBar />
-        <div style={{width:'100%',maxWidth:'480px',margin:'0 auto',padding:'0 20px'}}>
-          <GlassPanel style={{padding:'48px 40px'}}>
-            <div style={{textAlign:'center',marginBottom:32}}>
-              <div style={{fontSize:'3rem',marginBottom:16}}>👤</div>
-              <h2 style={{fontSize:'2rem',fontWeight:700,marginBottom:8,color:'#fff'}}>Customer Login</h2>
-              <p className="small-muted">Access your assets, KYC details, and loan information</p>
-            </div>
+        <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',padding:'40px 20px'}}>
+          <div style={{width:'100%',maxWidth:'520px'}}>
+            <GlassPanel style={{padding:'56px 48px',position:'relative',overflow:'hidden'}}>
+              {/* Decorative Elements */}
+              <div style={{
+                position:'absolute',
+                top:'-50px',
+                right:'-50px',
+                width:'200px',
+                height:'200px',
+                background:'radial-gradient(circle, rgba(199,255,58,0.08) 0%, transparent 70%)',
+                borderRadius:'50%',
+                pointerEvents:'none'
+              }}></div>
+              <div style={{
+                position:'absolute',
+                bottom:'-30px',
+                left:'-30px',
+                width:'150px',
+                height:'150px',
+                background:'radial-gradient(circle, rgba(155,225,43,0.06) 0%, transparent 70%)',
+                borderRadius:'50%',
+                pointerEvents:'none'
+              }}></div>
 
-            <form onSubmit={handleLogin}>
-              <div style={{marginBottom:20}}>
-                <label style={{display:'block',marginBottom:8,fontWeight:600,color:'#fff'}}>Account Number</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Enter your account number"
-                  value={loginForm.accountNumber}
-                  onChange={(e) => setLoginForm({...loginForm, accountNumber: e.target.value})}
-                  required
-                  style={{width:'100%',padding:'14px 16px',fontSize:'1rem'}}
-                />
+              <div style={{textAlign:'center',marginBottom:40,position:'relative'}}>
+                <div style={{
+                  fontSize:'4rem',
+                  marginBottom:20,
+                  filter:'drop-shadow(0 4px 12px rgba(199,255,58,0.2))'
+                }}>👤</div>
+                <h2 style={{fontSize:'2.2rem',fontWeight:700,marginBottom:12,color:'#fff',letterSpacing:'-0.02em'}}>
+                  Customer Portal
+                </h2>
+                <p className="small-muted" style={{fontSize:'1.05rem',lineHeight:1.6}}>
+                  Manage your assets, view KYC details, and access loans
+                </p>
               </div>
 
-              <div style={{marginBottom:24}}>
-                <label style={{display:'block',marginBottom:8,fontWeight:600,color:'#fff'}}>Password</label>
-                <input
-                  type="password"
-                  className="form-input"
-                  placeholder="Enter your password"
-                  value={loginForm.password}
-                  onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
-                  required
-                  style={{width:'100%',padding:'14px 16px',fontSize:'1rem'}}
-                />
-              </div>
+              <form onSubmit={handleLogin}>
+                <div style={{marginBottom:24}}>
+                  <label style={{display:'block',marginBottom:10,fontWeight:600,color:'#fff',fontSize:'0.95rem'}}>
+                    Account Number
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Enter your account number"
+                    value={loginForm.accountNumber}
+                    onChange={(e) => setLoginForm({...loginForm, accountNumber: e.target.value})}
+                    required
+                    style={{
+                      width:'100%',
+                      padding:'16px 18px',
+                      fontSize:'1rem',
+                      background:'rgba(255,255,255,0.04)',
+                      border:'1px solid rgba(255,255,255,0.12)',
+                      borderRadius:12,
+                      color:'#fff',
+                      transition:'all 0.3s ease'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--accent)'}
+                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.12)'}
+                  />
+                </div>
 
-              <button type="submit" className="btn primary" style={{width:'100%',padding:'14px',fontSize:'1rem',marginBottom:16}}>
-                Login to Portal
-              </button>
+                <div style={{marginBottom:32}}>
+                  <label style={{display:'block',marginBottom:10,fontWeight:600,color:'#fff',fontSize:'0.95rem'}}>
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    placeholder="Enter your password"
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+                    required
+                    style={{
+                      width:'100%',
+                      padding:'16px 18px',
+                      fontSize:'1rem',
+                      background:'rgba(255,255,255,0.04)',
+                      border:'1px solid rgba(255,255,255,0.12)',
+                      borderRadius:12,
+                      color:'#fff',
+                      transition:'all 0.3s ease'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--accent)'}
+                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.12)'}
+                  />
+                  <div style={{marginTop:10,textAlign:'right'}}>
+                    <a href="#" style={{fontSize:'0.9rem',color:'var(--accent)',textDecoration:'none'}}>
+                      Forgot Password?
+                    </a>
+                  </div>
+                </div>
 
-              <div style={{textAlign:'center',fontSize:'0.9rem',color:'var(--muted)'}}>
-                Demo: Use password <span style={{color:'var(--accent)',fontWeight:600}}>demo123</span> with any account number
-              </div>
-            </form>
-          </GlassPanel>
+                <button 
+                  type="submit" 
+                  className="btn primary" 
+                  style={{
+                    width:'100%',
+                    padding:'16px',
+                    fontSize:'1.05rem',
+                    fontWeight:600,
+                    marginBottom:24,
+                    background:'linear-gradient(135deg, var(--accent) 0%, #9be12b 100%)',
+                    border:'none',
+                    boxShadow:'0 4px 16px rgba(199,255,58,0.25)',
+                    transition:'all 0.3s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 6px 24px rgba(199,255,58,0.35)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 4px 16px rgba(199,255,58,0.25)';
+                  }}
+                >
+                  Login to Portal
+                </button>
+
+                <div style={{
+                  padding:'16px',
+                  background:'rgba(199,255,58,0.05)',
+                  border:'1px solid rgba(199,255,58,0.15)',
+                  borderRadius:12,
+                  marginBottom:20
+                }}>
+                  <div style={{fontSize:'0.9rem',color:'rgba(255,255,255,0.7)',marginBottom:6}}>
+                    🔐 <strong style={{color:'#fff'}}>Demo Credentials</strong>
+                  </div>
+                  <div style={{fontSize:'0.9rem',color:'rgba(255,255,255,0.6)'}}>
+                    Account: <span style={{color:'var(--accent)',fontWeight:600,fontFamily:'monospace'}}>any number</span>
+                    {' • '}
+                    Password: <span style={{color:'var(--accent)',fontWeight:600,fontFamily:'monospace'}}>demo123</span>
+                  </div>
+                </div>
+
+                <div style={{textAlign:'center',fontSize:'0.9rem',color:'var(--muted)'}}>
+                  New customer? <a href="#" style={{color:'var(--accent)',textDecoration:'none',fontWeight:600}}>Contact Bank</a>
+                </div>
+              </form>
+            </GlassPanel>
+          </div>
         </div>
         <Footer />
       </div>

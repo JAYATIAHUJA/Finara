@@ -81,8 +81,8 @@ export default function NavBar(){
           Home
         </a>
         <a 
-          className={isActive('/dashboard') || isActive('/customers') || isActive('/loans') ? 'active' : ''} 
-          onClick={() => navigate('/dashboard')}
+          className={isActive('/login') || isActive('/dashboard') || isActive('/customers') || isActive('/loans') ? 'active' : ''} 
+          onClick={() => navigate('/login')}
           style={{
             fontSize: scrolled ? '0.9rem' : '1rem',
             padding: scrolled ? '6px 10px' : '8px 12px',
@@ -112,17 +112,6 @@ export default function NavBar(){
           }}
         >
           Investor
-        </a>
-        <a 
-          className={isActive('/reports') ? 'active' : ''} 
-          onClick={() => navigate('/reports')}
-          style={{
-            fontSize: scrolled ? '0.9rem' : '1rem',
-            padding: scrolled ? '6px 10px' : '8px 12px',
-            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-        >
-          Compliance
         </a>
       </div>
     </div>
