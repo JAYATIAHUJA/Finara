@@ -12,6 +12,12 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
  * the core compliance features.
  */
 contract CompliantToken is ERC20, Ownable, ReentrancyGuard {
+    constructor(
+        string memory name,
+        string memory symbol,
+        address initialOwner
+    ) ERC20(name, symbol) Ownable(initialOwner) {}
+
     // Mapping to track KYC-verified addresses
     mapping(address => bool) public isVerified;
     
@@ -44,13 +50,12 @@ contract CompliantToken is ERC20, Ownable, ReentrancyGuard {
         _;
     }
     
-    constructor(
-        string memory name,
-        string memory symbol,
+    function initialize(
         address _bankAddress,
         uint256 _maxSupply
-    ) ERC20(name, symbol) Ownable(msg.sender) {
+    ) external onlyOwner {
         require(_bankAddress != address(0), "CompliantToken: Invalid bank address");
+        require(bankAddress == address(0), "CompliantToken: Already initialized");
         bankAddress = _bankAddress;
         maxSupply = _maxSupply;
     }
