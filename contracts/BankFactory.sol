@@ -10,6 +10,7 @@ import "./LendingContract.sol";
  * @dev Factory contract to deploy Token and Lending contracts for each bank
  */
 contract BankFactory is Ownable {
+    constructor() Ownable(msg.sender) {}
     // Structure to store bank deployment info
     struct BankDeployment {
         address bankAddress;
@@ -61,9 +62,9 @@ contract BankFactory is Ownable {
         CompliantToken token = new CompliantToken(
             tokenName,
             tokenSymbol,
-            bankAddress,
-            maxSupply
+            msg.sender
         );
+        token.initialize(bankAddress, maxSupply);
         tokenAddress = address(token);
         
         // Deploy LendingContract
