@@ -1,5 +1,6 @@
 const { ethers } = require('ethers');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 /**
  * Relayer service for handling blockchain transactions
@@ -12,29 +13,43 @@ class RelayerService {
       process.env.SEPOLIA_RPC_URL || 'https://rpc.sepolia.org'
     );
     
-    if (!process.env.RELAYER_PRIVATE_KEY) {
-      throw new Error('RELAYER_PRIVATE_KEY is required in environment variables');
+    if (!process.env.RELAYER_PRIVATE_KEY || process.env.RELAYER_PRIVATE_KEY === '0x0000000000000000000000000000000000000000000000000000000000000000') {
+      console.warn('⚠️  Warning: RELAYER_PRIVATE_KEY not configured or using placeholder');
+      console.warn('   Blockchain transactions will not work until you set a valid private key');
+      console.warn('   Server will run in demo mode');
+      this.demoMode = true;
+      return;
     }
     
     this.wallet = new ethers.Wallet(process.env.RELAYER_PRIVATE_KEY, this.provider);
     this.factoryAddress = process.env.FACTORY_ADDRESS;
     
-    // Load contract ABIs
-    this.factoryABI = require('../../artifacts/contracts/BankFactory.sol/BankFactory.json').abi;
-    this.tokenABI = require('../../artifacts/contracts/CompliantToken.sol/CompliantToken.json').abi;
-    this.lendingABI = require('../../artifacts/contracts/LendingContract.sol/LendingContract.json').abi;
-    
-    this.factoryContract = new ethers.Contract(
-      this.factoryAddress,
-      this.factoryABI,
-      this.wallet
-    );
+    try {
+      // Load contract ABIs
+      this.factoryABI = require('../../artifacts/contracts/BankFactory.sol/BankFactory.json').abi;
+      this.tokenABI = require('../../artifacts/contracts/CompliantToken.sol/CompliantToken.json').abi;
+      this.lendingABI = require('../../artifacts/contracts/LendingContract.sol/LendingContract.json').abi;
+      
+      if (this.factoryAddress && this.factoryAddress !== '0x0000000000000000000000000000000000000000') {
+        this.factoryContract = new ethers.Contract(
+          this.factoryAddress,
+          this.factoryABI,
+          this.wallet
+        );
+      }
+    } catch (error) {
+      console.warn('⚠️  Warning: Contract artifacts not found. Run "npm run compile" first');
+      this.demoMode = true;
+    }
   }
   
   /**
    * Get the relayer wallet address
    */
   getRelayerAddress() {
+    if (this.demoMode) {
+      return '0x0000000000000000000000000000000000000000';
+    }
     return this.wallet.address;
   }
   
@@ -42,6 +57,9 @@ class RelayerService {
    * Get the current balance of the relayer wallet
    */
   async getBalance() {
+    if (this.demoMode) {
+      return ethers.parseEther('0');
+    }
     return await this.provider.getBalance(this.wallet.address);
   }
   
@@ -49,6 +67,13 @@ class RelayerService {
    * Deploy a new bank setup
    */
   async deployBank(bankAddress, bankName, tokenName, tokenSymbol, maxSupply, collateralizationRatio) {
+    if (this.demoMode) {
+      return {
+        success: false,
+        error: 'Relayer service is in demo mode. Please configure RELAYER_PRIVATE_KEY and deploy contracts.'
+      };
+    }
+    
     try {
       const tx = await this.factoryContract.deployBank(
         bankAddress,
@@ -106,6 +131,13 @@ class RelayerService {
    * Authorize relayer on a token contract
    */
   async authorizeRelayer(tokenAddress) {
+    if (this.demoMode) {
+      return {
+        success: false,
+        error: 'Relayer service is in demo mode'
+      };
+    }
+    
     try {
       const tokenContract = new ethers.Contract(tokenAddress, this.tokenABI, this.wallet);
       
@@ -130,6 +162,13 @@ class RelayerService {
    * Verify customer addresses on the token contract
    */
   async verifyCustomers(tokenAddress, addresses) {
+    if (this.demoMode) {
+      return {
+        success: false,
+        error: 'Relayer service is in demo mode'
+      };
+    }
+    
     try {
       const tokenContract = new ethers.Contract(tokenAddress, this.tokenABI, this.wallet);
       
@@ -155,6 +194,13 @@ class RelayerService {
    * Mint tokens to a verified address
    */
   async mintToken(tokenAddress, toAddress, amount) {
+    if (this.demoMode) {
+      return {
+        success: false,
+        error: 'Relayer service is in demo mode'
+      };
+    }
+    
     try {
       const tokenContract = new ethers.Contract(tokenAddress, this.tokenABI, this.wallet);
       
@@ -184,6 +230,13 @@ class RelayerService {
    * Create a loan
    */
   async createLoan(lendingAddress, borrower, collateralAmount, loanAmount, interestRate, duration) {
+    if (this.demoMode) {
+      return {
+        success: false,
+        error: 'Relayer service is in demo mode'
+      };
+    }
+    
     try {
       const lendingContract = new ethers.Contract(lendingAddress, this.lendingABI, this.wallet);
       
@@ -233,6 +286,9 @@ class RelayerService {
    * Get token contract instance
    */
   getTokenContract(tokenAddress) {
+    if (this.demoMode) {
+      return null;
+    }
     return new ethers.Contract(tokenAddress, this.tokenABI, this.provider);
   }
   
@@ -240,6 +296,9 @@ class RelayerService {
    * Get lending contract instance
    */
   getLendingContract(lendingAddress) {
+    if (this.demoMode) {
+      return null;
+    }
     return new ethers.Contract(lendingAddress, this.lendingABI, this.provider);
   }
   
@@ -247,6 +306,9 @@ class RelayerService {
    * Get factory contract instance
    */
   getFactoryContract() {
+    if (this.demoMode) {
+      return null;
+    }
     return this.factoryContract;
   }
 }

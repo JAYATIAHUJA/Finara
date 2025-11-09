@@ -58,9 +58,30 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Finara Backend Server running on port ${PORT}`);
-  console.log(`📍 Health check: http://localhost:${PORT}/health`);
-  console.log(`📚 API docs: http://localhost:${PORT}/`);
+  console.log(`
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║   🚀 Finara Backend Server                                     ║
+║                                                                ║
+║   Status: ✅ Running on port ${PORT}                              ║
+║   Health: http://localhost:${PORT}/health                         ║
+║   API:    http://localhost:${PORT}/                               ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+  `);
+  
+  // Check configuration
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY ||
+      process.env.SUPABASE_URL === 'https://your-project.supabase.co') {
+    console.log('⚠️  Running in DEMO MODE - Database not configured');
+    console.log('   To enable database: Update .env with your Supabase credentials\n');
+  }
+  
+  if (!process.env.RELAYER_PRIVATE_KEY ||
+      process.env.RELAYER_PRIVATE_KEY === '0x0000000000000000000000000000000000000000000000000000000000000000') {
+    console.log('⚠️  Blockchain features disabled - Relayer not configured');
+    console.log('   To enable blockchain: Update RELAYER_PRIVATE_KEY in .env\n');
+  }
 });
 
 module.exports = app;
