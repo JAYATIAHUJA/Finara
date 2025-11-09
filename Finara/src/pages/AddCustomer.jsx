@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SideNav from '../components/SideNav';
-import GlassPanel from '../components/GlassPanel';
 import Footer from '../components/Footer';
+import GlassPanel from '../components/GlassPanel';
+import SideNav from '../components/SideNav';
+import api from '../services/api';
 import '../styles/theme.css';
 
 export default function AddCustomer() {
@@ -19,12 +20,58 @@ export default function AddCustomer() {
     assetValue: '',
     assetDetails: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleSubmit = (e) => {
+  // Generate a wallet address from customer data (simple hash-based approach)
+  const generateWalletAddress = (name, kycId, email) => {
+    // Simple hash function to generate a deterministic wallet address
+    const str = `${name}-${kycId}-${email}-${Date.now()}`;
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    // Generate a 40-character hex string (Ethereum address format)
+    const hex = Math.abs(hash).toString(16).padStart(8, '0');
+    return '0x' + hex.repeat(5).substring(0, 40);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Mock customer creation - generate random ID
-    const customerId = 'CUST' + Math.floor(Math.random() * 10000);
-    navigate(`/customer/${customerId}`);
+    setLoading(true);
+    setError(null);
+
+    try {
+      // TODO: Get bank address from context/localStorage - using hardcoded for now
+      const bankAddress = localStorage.getItem('bankAddress') || '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65';
+      
+      // Generate wallet address for the customer
+      const walletAddress = generateWalletAddress(formData.name, formData.kycId, formData.email);
+
+      // Prepare customer data for API
+      const customerData = {
+        name: formData.name,
+        accountId: formData.kycId,
+        walletAddress: walletAddress
+      };
+
+      // Call API to create customer
+      const result = await api.uploadCustomers(bankAddress, [customerData]);
+
+      if (result.success) {
+        // Success - navigate to customers list
+        navigate('/customers');
+      } else {
+        setError(result.error || 'Failed to create customer');
+      }
+    } catch (err) {
+      console.error('Error creating customer:', err);
+      setError(err.message || 'An error occurred while creating the customer');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,6 +91,18 @@ export default function AddCustomer() {
         </div>
 
         <GlassPanel style={{maxWidth:800,padding:40,marginBottom:32}}>
+          {error && (
+            <div style={{
+              padding: '16px 20px',
+              background: 'rgba(255, 0, 0, 0.1)',
+              border: '1px solid rgba(255, 0, 0, 0.3)',
+              borderRadius: 12,
+              marginBottom: 24,
+              color: '#ff6b6b'
+            }}>
+              <strong>Error:</strong> {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit}>
             {/* Customer Information */}
             <div style={{marginBottom:32}}>
@@ -210,10 +269,21 @@ export default function AddCustomer() {
 
             {/* Submit */}
             <div style={{display:'flex',gap:16}}>
-              <button type="submit" className="btn primary" style={{flex:1,padding:'16px',fontSize:'1.05rem',fontWeight:600}}>
-                Create Customer Profile →
+              <button 
+                type="submit" 
+                className="btn primary" 
+                style={{flex:1,padding:'16px',fontSize:'1.05rem',fontWeight:600}}
+                disabled={loading}
+              >
+                {loading ? 'Creating Customer...' : 'Create Customer Profile →'}
               </button>
-              <button type="button" className="btn" onClick={() => navigate('/dashboard')} style={{padding:'16px 32px',fontSize:'1.05rem'}}>
+              <button 
+                type="button" 
+                className="btn" 
+                onClick={() => navigate('/dashboard')} 
+                style={{padding:'16px 32px',fontSize:'1.05rem'}}
+                disabled={loading}
+              >
                 Cancel
               </button>
             </div>

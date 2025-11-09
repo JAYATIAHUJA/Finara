@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import SideNav from '../components/SideNav';
 import GlassPanel from '../components/GlassPanel';
 import Card from '../components/Card';
 import Footer from '../components/Footer';
+import api from '../services/api';
 import '../styles/theme.css';
 
 const portfolioData = [
@@ -40,6 +41,50 @@ const topCustomers = [
 export default function BankAdmin(){
   const navigate = useNavigate();
   const [timeRange, setTimeRange] = useState('6M');
+  const [analytics, setAnalytics] = useState(null);
+  const [activity, setActivity] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // TODO: Replace with actual bank address from context/login
+  const bankAddress = '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65';
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Fetch analytics
+        const analyticsResult = await api.getBankAnalytics(bankAddress);
+        if (analyticsResult.success) {
+          setAnalytics(analyticsResult.data);
+        }
+
+        // Fetch activity feed
+        const activityResult = await api.getBankActivity(bankAddress);
+        if (activityResult.success) {
+          setActivity(activityResult.data);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+    
+    // Refresh data every 30 seconds
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
+  }, [bankAddress]);
+
+  // Show loading state
+  if (loading && !analytics) {
+    return (
+      <div style={{display:'flex',minHeight:'100vh',background:'#000',alignItems:'center',justifyContent:'center'}}>
+        <div style={{color:'#fff',fontSize:'1.2rem'}}>Loading dashboard...</div>
+      </div>
+    );
+  }
 
   return (
     <div style={{display:'flex',minHeight:'100vh',background:'#000'}}>
@@ -76,32 +121,48 @@ export default function BankAdmin(){
             <div style={{fontSize:'2rem',marginBottom:12}}>💰</div>
             <div className="small-muted" style={{marginBottom:8,fontSize:'0.9rem'}}>Total Value Locked</div>
             <div style={{display:'flex',alignItems:'baseline',gap:12}}>
-              <div style={{fontSize:'2rem',fontWeight:700,color:'var(--accent)'}}>₹56L</div>
-              <div style={{fontSize:'0.9rem',color:'#82ca9d',fontWeight:600}}>+18%</div>
+              <div style={{fontSize:'2rem',fontWeight:700,color:'var(--accent)'}}>
+                ₹{analytics?.stats?.totalValueLocked ? (analytics.stats.totalValueLocked / 100000).toFixed(1) : '0'}L
+              </div>
+              <div style={{fontSize:'0.9rem',color:'#82ca9d',fontWeight:600}}>
+                {analytics?.stats?.tvlChangePercent ? `+${analytics.stats.tvlChangePercent}%` : '--'}
+              </div>
             </div>
           </Card>
           <Card>
             <div style={{fontSize:'2rem',marginBottom:12}}>👥</div>
             <div className="small-muted" style={{marginBottom:8,fontSize:'0.9rem'}}>Active Customers</div>
             <div style={{display:'flex',alignItems:'baseline',gap:12}}>
-              <div style={{fontSize:'2rem',fontWeight:700,color:'#fff'}}>248</div>
-              <div style={{fontSize:'0.9rem',color:'#82ca9d',fontWeight:600}}>+12%</div>
+              <div style={{fontSize:'2rem',fontWeight:700,color:'#fff'}}>
+                {analytics?.stats?.totalCustomers || 0}
+              </div>
+              <div style={{fontSize:'0.9rem',color:'#82ca9d',fontWeight:600}}>
+                {analytics?.stats?.newCustomersThisMonth ? `+${analytics.stats.newCustomersThisMonth}` : '--'}
+              </div>
             </div>
           </Card>
           <Card>
             <div style={{fontSize:'2rem',marginBottom:12}}>🪙</div>
             <div className="small-muted" style={{marginBottom:8,fontSize:'0.9rem'}}>Tokens Minted</div>
             <div style={{display:'flex',alignItems:'baseline',gap:12}}>
-              <div style={{fontSize:'2rem',fontWeight:700,color:'#fff'}}>2.8K</div>
-              <div style={{fontSize:'0.9rem',color:'#82ca9d',fontWeight:600}}>+22%</div>
+              <div style={{fontSize:'2rem',fontWeight:700,color:'#fff'}}>
+                {analytics?.stats?.totalTokensMinted ? (analytics.stats.totalTokensMinted / 1000).toFixed(1) : '0'}K
+              </div>
+              <div style={{fontSize:'0.9rem',color:'#82ca9d',fontWeight:600}}>
+                {analytics?.stats?.tokensChangePercent ? `+${analytics.stats.tokensChangePercent}%` : '--'}
+              </div>
             </div>
           </Card>
           <Card>
             <div style={{fontSize:'2rem',marginBottom:12}}>💵</div>
             <div className="small-muted" style={{marginBottom:8,fontSize:'0.9rem'}}>Active Loans</div>
             <div style={{display:'flex',alignItems:'baseline',gap:12}}>
-              <div style={{fontSize:'2rem',fontWeight:700,color:'#fff'}}>31</div>
-              <div style={{fontSize:'0.9rem',color:'#82ca9d',fontWeight:600}}>+8%</div>
+              <div style={{fontSize:'2rem',fontWeight:700,color:'#fff'}}>
+                {analytics?.stats?.activeLoans || 0}
+              </div>
+              <div style={{fontSize:'0.9rem',color:'#82ca9d',fontWeight:600}}>
+                {analytics?.stats?.loansChangePercent ? `+${analytics.stats.loansChangePercent}%` : '--'}
+              </div>
             </div>
           </Card>
         </div>
@@ -195,7 +256,7 @@ export default function BankAdmin(){
           <GlassPanel style={{padding:28}}>
             <h3 style={{fontSize:'1.4rem',fontWeight:700,marginBottom:20,color:'#fff'}}>Recent Activity</h3>
             <div style={{display:'flex',flexDirection:'column',gap:12}}>
-              {recentActivity.map((activity, i) => (
+              {activity.length > 0 ? activity.slice(0, 5).map((act, i) => (
                 <div key={i} style={{
                   padding:16,
                   background:'rgba(255,255,255,0.02)',
@@ -206,16 +267,32 @@ export default function BankAdmin(){
                   alignItems:'center'
                 }}>
                   <div style={{flex:1}}>
-                    <div style={{fontSize:'1rem',fontWeight:600,color:'#fff',marginBottom:4}}>{activity.event}</div>
+                    <div style={{fontSize:'1rem',fontWeight:600,color:'#fff',marginBottom:4}}>
+                      {act.type === 'token_mint' && '🪙 Token Minted'}
+                      {act.type === 'loan_disbursed' && '💰 Loan Disbursed'}
+                      {act.type === 'customer_added' && '✓ Customer Added'}
+                      {!['token_mint', 'loan_disbursed', 'customer_added'].includes(act.type) && '📊 Activity'}
+                    </div>
                     <div style={{fontSize:'0.9rem',color:'var(--muted)'}}>
-                      {activity.customer} • {activity.amount}
+                      {act.customer_name || act.wallet_address?.slice(0, 10) + '...'} • {act.amount || '--'}
                     </div>
                   </div>
                   <div style={{textAlign:'right'}}>
-                    <div style={{fontSize:'0.85rem',color:'var(--muted)'}}>{activity.time}</div>
+                    <div style={{fontSize:'0.85rem',color:'var(--muted)'}}>
+                      {new Date(act.created_at).toLocaleString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </div>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div style={{textAlign:'center',padding:'40px 0',color:'var(--muted)'}}>
+                  No recent activity
+                </div>
+              )}
             </div>
           </GlassPanel>
 

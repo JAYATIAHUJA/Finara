@@ -112,6 +112,38 @@ class APIService {
   }
 
   /**
+   * Get analytics for a bank
+   */
+  async getBankAnalytics(bankAddress) {
+    const response = await fetch(`${API_BASE_URL}/analytics/${bankAddress}`);
+    return response.json();
+  }
+
+  /**
+   * Get token balance for a wallet
+   */
+  async getTokenBalance(tokenAddress, walletAddress) {
+    const response = await fetch(`${API_BASE_URL}/token/${tokenAddress}/balance/${walletAddress}`);
+    return response.json();
+  }
+
+  /**
+   * Get customer details with balances
+   */
+  async getCustomerDetails(walletAddress) {
+    const response = await fetch(`${API_BASE_URL}/customer/${walletAddress}`);
+    return response.json();
+  }
+
+  /**
+   * Get activity feed for a bank
+   */
+  async getBankActivity(bankAddress, limit = 20) {
+    const response = await fetch(`${API_BASE_URL}/activity/${bankAddress}?limit=${limit}`);
+    return response.json();
+  }
+
+  /**
    * Health check
    */
   async healthCheck() {

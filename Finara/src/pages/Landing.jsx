@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import GridScan from '../components/GridScan';
 import GlassPanel from '../components/GlassPanel';
 import NavBar from '../components/NavBar';
@@ -135,12 +134,21 @@ export default function Landing({ onExplore }){
                 style={{width:'100%',height:'100%',opacity:0.7}}
               />
               <div style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%, -50%)',width:380,height:380,display:'flex',alignItems:'center',justifyContent:'center',pointerEvents:'none'}}>
-                <DotLottieReact
-                  src="https://lottie.host/822907be-9035-41a1-aaf2-b338277576bc/6pQCOGcvF2.lottie"
-                  loop
-                  autoplay
-                  style={{width:'100%',height:'100%'}}
-                />
+                {/* CSS Pulse Animation - Replaced Lottie due to buffer mismatch */}
+                <div style={{
+                  width: '60%',
+                  height: '60%',
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, var(--accent) 0%, transparent 70%)',
+                  animation: 'pulse 3s ease-in-out infinite',
+                  opacity: 0.3
+                }} />
+                <style>{`
+                  @keyframes pulse {
+                    0%, 100% { transform: scale(0.8); opacity: 0.3; }
+                    50% { transform: scale(1.2); opacity: 0.6; }
+                  }
+                `}</style>
               </div>
             </div>
           </motion.div>
