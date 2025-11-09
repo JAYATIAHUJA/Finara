@@ -18,6 +18,7 @@ app.use('/api', require('./routes/customers'));
 app.use('/api', require('./routes/tokens'));
 app.use('/api', require('./routes/lending'));
 app.use('/api', require('./routes/analytics'));
+app.use('/api', require('./routes/tokenize'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {

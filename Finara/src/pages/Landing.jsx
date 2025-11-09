@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import GridScan from '../components/GridScan';
-import GlassPanel from '../components/GlassPanel';
-import NavBar from '../components/NavBar';
+import { useState } from 'react';
 import Footer from '../components/Footer';
+import GlassPanel from '../components/GlassPanel';
+import GridScan from '../components/GridScan';
+import NavBar from '../components/NavBar';
 import '../styles/theme.css';
 
 export default function Landing({ onExplore }){

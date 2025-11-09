@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS token_mints (
     amount NUMERIC NOT NULL,
     transaction_hash TEXT NOT NULL,
     block_number BIGINT,
+    asset_id TEXT,
     minted_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -59,15 +60,17 @@ CREATE TABLE IF NOT EXISTS loans (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Assets table (for storing verified asset data)
+-- Assets table (for storing verified asset data and tokenization)
 CREATE TABLE IF NOT EXISTS assets (
     id BIGSERIAL PRIMARY KEY,
     bank_address TEXT NOT NULL,
+    customer_wallet TEXT NOT NULL,
     asset_id TEXT NOT NULL,
     asset_type TEXT NOT NULL,
     description TEXT,
     value NUMERIC NOT NULL,
-    tokenized_amount NUMERIC,
+    tokenized_amount NUMERIC DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'pending',
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -82,6 +85,8 @@ CREATE INDEX IF NOT EXISTS idx_token_mints_wallet_address ON token_mints(wallet_
 CREATE INDEX IF NOT EXISTS idx_loans_bank_address ON loans(bank_address);
 CREATE INDEX IF NOT EXISTS idx_loans_borrower_address ON loans(borrower_address);
 CREATE INDEX IF NOT EXISTS idx_assets_bank_address ON assets(bank_address);
+CREATE INDEX IF NOT EXISTS idx_assets_customer_wallet ON assets(customer_wallet);
+CREATE INDEX IF NOT EXISTS idx_assets_asset_id ON assets(asset_id);
 
 -- Enable Row Level Security (RLS) - adjust policies based on your needs
 ALTER TABLE banks ENABLE ROW LEVEL SECURITY;

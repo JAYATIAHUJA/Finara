@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
-import SideNav from '../components/SideNav';
-import GlassPanel from '../components/GlassPanel';
+import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import Card from '../components/Card';
 import Footer from '../components/Footer';
+import GlassPanel from '../components/GlassPanel';
+import SideNav from '../components/SideNav';
 import api from '../services/api';
 import '../styles/theme.css';
 

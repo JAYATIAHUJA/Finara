@@ -152,11 +152,11 @@ router.get('/customer/:walletAddress', async (req, res) => {
   try {
     const { walletAddress } = req.params;
 
-    // Get customer info
+    // Get customer info (normalize to lowercase)
     const { data: customer } = await supabase
       .from('customers')
       .select('*')
-      .eq('wallet_address', walletAddress)
+      .eq('wallet_address', walletAddress.toLowerCase())
       .single();
 
     if (!customer) {
